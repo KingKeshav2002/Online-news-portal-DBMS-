@@ -1,0 +1,123 @@
+1) Update
+
+Update the salary of a worker with a specific email:
+UPDATE worker
+SET Salary = 5000
+WHERE Email = 'example@email.com';
+
+insert 
+Insert a new record into the newspaper table:
+INSERT INTO newspaper (Name, publishFrequency, Owner, publisher)
+VALUES ('The New Gazette', '7', 'John Doe', 'john@publisher.com');
+
+
+2) LEFT JOIN 
+
+Retrieve the names of newspapers and the count of magazines published by each newspaper:
+SELECT n.Name AS NewspaperName, COUNT(m.magazineNum) AS MagazineCount
+FROM newspaper n
+LEFT JOIN magazine m ON n.Name = m.newspaperName
+GROUP BY n.Name;
+
+3) INNER JOIN 
+Get the journalist's email and their resume for all journalists who are columnists:
+SELECT j.journalistEmail, j.resume
+FROM journalist j
+INNER JOIN working w ON j.journalistEmail = w.workerEmail
+INNER JOIN newspaper n ON w.newspaperName = n.Name
+WHERE j.isColumnist = 1;
+
+Retrieve the names of newspapers along with the names of their publishers:
+
+SELECT n.Name AS NewspaperName, p.publisherEmail AS PublisherEmail
+FROM newspaper n
+INNER JOIN publisher p ON n.publisher = p.publisherEmail;
+
+
+4)  union
+Get the email addresses of journalists who have submitted articles and journalists who have approved articles:
+
+SELECT journalistSubEmail AS Email
+FROM submits
+UNION
+SELECT journalistEmail AS Email
+FROM approves;
+
+
+Retrieve the titles and paths of articles that are either accepted or rejected:
+
+SELECT title, path
+FROM article
+WHERE state = 'accepted'
+UNION
+SELECT title, path
+FROM article
+WHERE state = 'rejected';
+
+
+6) intersection
+
+Find the journalist's email addresses who have both submitted and approved articles:
+
+SELECT journalistEmail AS Email
+FROM approves
+INTERSECT
+SELECT journalistSubEmail AS Email
+FROM submits;
+
+Retrieve the titles and paths of articles that are both accepted and have pictures:
+
+SELECT a.title, a.path
+FROM article a
+INNER JOIN pictures p ON a.path = p.pathOfArticle
+WHERE a.state = 'accepted';
+
+
+7) EXISTS:
+
+Find the names of newspapers that have at least one journalist working for them:
+
+SELECT n.Name AS NewspaperName
+FROM newspaper n
+WHERE EXISTS (
+  SELECT 1
+  FROM working w
+  WHERE w.newspaperName = n.Name
+);
+
+
+Get the email addresses of journalists who have submitted articles:
+
+SELECT j.journalistEmail AS Email
+FROM journalist j
+WHERE EXISTS (
+  SELECT 1
+  FROM submits s
+  WHERE s.journalistSubEmail = j.journalistEmail
+);
+
+
+8) NOT EXIST 
+Find the names of newspapers that don't have any journalists working for them:
+
+SELECT n.Name AS NewspaperName
+FROM newspaper n
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM working w
+  WHERE w.newspaperName = n.Name
+);
+
+
+
+Retrieve the titles of articles that don't have any associated pictures:
+
+
+SELECT a.title
+FROM article a
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM pictures p
+  WHERE p.pathOfArticle = a.path
+);
+
